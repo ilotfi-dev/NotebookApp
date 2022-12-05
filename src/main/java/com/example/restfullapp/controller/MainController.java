@@ -25,7 +25,7 @@ public class MainController {
     public String list(Model model) {
         List<Note> notes = filterAndSort();
         model.addAttribute("notes", notes);
-        return "mainPage";
+        return "index";
     }
 
     @GetMapping("/new")
