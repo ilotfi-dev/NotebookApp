@@ -58,7 +58,7 @@ public class MainController {
         return "edit";
     }
 
-    //Decide what to do with doneChanger!
+
     @PostMapping("/doneChanger/{id}")
     public String editDoneStatus(@PathVariable Long id, @RequestParam(value = "done", required = false) boolean done) {
         Note note = service.findNote(id);
