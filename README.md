@@ -1,7 +1,8 @@
 # NotebookApp
+##*Authentication (Security) added*
 
 Spring project on Java using basic stack of technologies: 
-*Authentication (Security) added *
+
 
 Spring Framework(Boot, Security, JPA), Apache Maven, MySQL and Thymeleaf + bootstrap on view side.
 
