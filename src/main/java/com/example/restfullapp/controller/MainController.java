@@ -1,8 +1,12 @@
 package com.example.restfullapp.controller;
 
 import com.example.restfullapp.entity.Note;
+import com.example.restfullapp.entity.Person;
+import com.example.restfullapp.security.PersonDetails;
 import com.example.restfullapp.service.NoteService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.restfullapp.service.PersonDetailsService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,25 +16,33 @@ import java.util.List;
 
 @Controller
 public class MainController {
-    private NoteService service;
+    private final NoteService service;
     private String filterMethod = "ALL";
     private String sortDateMethod = "DESC";
 
-    @Autowired
-    public void setService(NoteService service) {
+
+    public MainController(NoteService service) {
         this.service = service;
     }
 
     @GetMapping("/")
     public String list(Model model) {
-        List<Note> notes = filterAndSort();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
+        Person person = personDetails.getPerson();
+        List<Note> notes = filterAndSort(person);
         model.addAttribute("notes", notes);
         return "index";
+    }
+    @PostMapping("/save")
+    public String saveNote(@RequestParam String text) {
+        service.saveNote(new Note(text));
+        return "redirect:/";
     }
 
     @GetMapping("/new")
     public String newNote() {
-        return "/new";
+        return "newNote";
     }
 
     @GetMapping("/filter/{filter}")
@@ -60,16 +72,9 @@ public class MainController {
 
 
     @PostMapping("/doneChanger/{id}")
-    public String editDoneStatus(@PathVariable Long id, @RequestParam(value = "done", required = false) boolean done) {
+    public String editDoneStatus(@PathVariable Long id) {
         Note note = service.findNote(id);
-        service.editDoneField(done, note);
-        return "redirect:/";
-    }
-
-
-    @PostMapping("/save")
-    public String saveNote(@RequestParam String text) {
-        service.saveNote(new Note(text));
+        service.editDoneField(note);
         return "redirect:/";
     }
 
@@ -79,25 +84,25 @@ public class MainController {
         return "redirect:/";
     }
 
-    private List<Note> filterAndSort() {
+    private List<Note> filterAndSort(Person person) {
         List<Note> notes = null;
         switch (filterMethod) {
             case "ALL":
                 switch (sortDateMethod) {
-                    case "ASC" -> notes = service.findOldFirst();
-                    case "DESC" -> notes = service.findNewFirst();
+                    case "ASC" -> notes = service.findOldFirst(person);
+                    case "DESC" -> notes = service.findNewFirst(person);
                 }
                 break;
             case "TRUE":
                 switch (sortDateMethod) {
-                    case "ASC" -> notes = service.findOldFirstDoneTrue();
-                    case "DESC" -> notes = service.findNewFirstDoneTrue();
+                    case "ASC" -> notes = service.findOldFirstDoneTrue(person);
+                    case "DESC" -> notes = service.findNewFirstDoneTrue(person);
                 }
                 break;
             case "FALSE":
                 switch (sortDateMethod) {
-                    case "ASC" -> notes = service.findOldFirstDoneFalse();
-                    case "DESC" -> notes = service.findNewFirstDoneFalse();
+                    case "ASC" -> notes = service.findOldFirstDoneFalse(person);
+                    case "DESC" -> notes = service.findNewFirstDoneFalse(person);
                 }
                 break;
         }
