@@ -1,5 +1,5 @@
 # NotebookApp
-##*Authentication (Security) added*
+## *Authentication (Security) added*
 
 Spring project on Java using basic stack of technologies: 
 
