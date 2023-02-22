@@ -82,6 +82,10 @@
     <form align="left" th:action="@{'/new'}">
         <button type="submit" class="btn btn-outline-dark">New note</button>
     </form>
+    <form th:action="${'/logout'}" th:method="post">
+        <input type="submit" class="btn btn-outline-warning" value="Logout"/>
+    </form>
+
 </div>
 </body>
 </html>
